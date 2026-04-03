@@ -1642,6 +1642,19 @@ class DiscordAdapter(BasePlatformAdapter):
             await interaction.response.defer(ephemeral=True)
             await self._handle_thread_create_slash(interaction, name, message, auto_archive_duration)
 
+        @tree.command(name="bind", description="Bind this channel to a GitHub repo for persistent project context")
+        @discord.app_commands.describe(action="Action: info (default), new, unbind, or list")
+        @discord.app_commands.choices(action=[
+            discord.app_commands.Choice(name="info — Show current binding", value="info"),
+            discord.app_commands.Choice(name="new — Bind to a new repo", value="new"),
+            discord.app_commands.Choice(name="unbind — Remove binding", value="unbind"),
+            discord.app_commands.Choice(name="list — List all bindings", value="list"),
+        ])
+        async def slash_bind(interaction: discord.Interaction, action: str = "info"):
+            await interaction.response.defer(ephemeral=True)
+            cmd = f"/bind {action}" if action != "info" else "/bind"
+            await self._run_simple_slash(interaction, cmd)
+
     def _build_slash_event(self, interaction: discord.Interaction, text: str) -> MessageEvent:
         """Build a MessageEvent from a Discord slash command interaction."""
         is_dm = isinstance(interaction.channel, discord.DMChannel)
